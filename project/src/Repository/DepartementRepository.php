@@ -38,4 +38,39 @@ class DepartementRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    #########################################
+
+    public function findByNom($nom)
+    {
+        return $this->createQueryBuilder('d')
+            ->where('d.nom LIKE :nom')
+            ->setParameter('nom', '%'.$nom.'%')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+    public function findByCode($code)
+    {
+        return $this->createQueryBuilder('d')
+            ->where('d.code = :code')
+            ->setParameter('code', $code)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+    public function findByRegion($region)
+    {
+        return $this->createQueryBuilder('d')
+            ->innerJoin('d.region', 'r')
+            ->where('r.id = :region')
+            ->setParameter('region', $region)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+
 }

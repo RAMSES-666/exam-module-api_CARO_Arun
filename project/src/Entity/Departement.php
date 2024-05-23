@@ -6,8 +6,35 @@ use App\Repository\DepartementRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Serializer\Attribute\Groups;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter as OrmSearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter as OrmOrderFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\ApiResource;
 
 #[ORM\Entity(repositoryClass: DepartementRepository::class)]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ["groups" => ["departement:read:collection"]]
+        ),
+        new Get(
+            normalizationContext: ["groups" => ["departement:read"]]
+        )
+    ]
+)]
+#[ApiFilter(OrmSearchFilter::class, properties: [
+    'region' => 'exact', 'nom' => 'partial', 'numero' => 'exact'
+]
+)]
+#[ApiFilter(OrmOrderFilter::class, properties: [
+    'nom' => 'ASC', 'numero' => 'ASC'
+]
+)]
+
 class Departement
 {
     #[ORM\Id]
@@ -16,9 +43,11 @@ class Departement
     private ?int $id = null;
 
     #[ORM\Column(length: 3)]
+    #[Groups(["departement:read:collection", "departement:read"])]
     private ?string $numero = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(["departement:read:collection", "departement:read"])]
     private ?string $label = null;
 
     #[ORM\Column(length: 255)]
